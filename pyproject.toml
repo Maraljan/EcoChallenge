@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "ecochallange"
+version = "0.1.0"
+description = ""
+authors = ["maral.ashyrova <ashirova310197@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.95.2"
+pydantic = {extras = ["email"], version = "^1.10.7"}
+uvicorn = {extras = ["standart"], version = "^0.22.0"}
+sqlmodel = "^0.0.8"
+alembic = "^1.11.1"
+asyncpg = "^0.27.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
