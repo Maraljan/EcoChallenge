@@ -27,7 +27,7 @@ async def get_questions(session: DbSession) -> list[QuestionGet]:
 
 
 @router.delete('/{question_id}')
-async def delete_quiz(question_id: int, session: DbSession):
+async def delete_question(question_id: int, session: DbSession):
     statement = sqlmodel.delete(Question).where(Question.question_id == question_id)
     await session.execute(statement)
     await session.commit()
