@@ -1,1 +1,1 @@
-from . import user_router, share_friend_router
+from . import user_router, points_count_router, points_transaction_router

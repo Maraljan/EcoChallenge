@@ -8,7 +8,7 @@ from eco_challenge.daily_task_app.models.daily_task_history_model import \
     DailyTaskHistoryCreate, \
     DailyTaskHistoryGet, \
     DailyTaskHistory
-from eco_challenge.daily_task_app.models.daily_task_model import DailyTask, DailyTaskGet
+# from eco_challenge.daily_task_app.models.daily_task_model import DailyTask, DailyTaskGet
 
 from eco_challenge.auth import CurrentUser
 
