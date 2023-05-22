@@ -14,5 +14,4 @@ The EcoChallenge app and website are innovative platforms designed to empower in
 
 ## Database diagrams
 
-![quiz_app_tables.png](images/quiz_app_tables.png)
-![other_tables.png](images/other_tables.png)
+![tables.png](images/tables.png)
