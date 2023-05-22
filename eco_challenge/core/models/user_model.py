@@ -1,7 +1,11 @@
+import typing
+
 from pydantic import EmailStr
 
 from sqlmodel import SQLModel, Field, Relationship
 # from .share_friends_model import ShareFriendGet, ShareFriend
+if typing.TYPE_CHECKING:
+    from eco_challenge.daily_task_app.models.daily_task_history_model import DailyTaskHistory
 
 
 class UserBase(SQLModel):
@@ -25,5 +29,5 @@ class UserGet(UserBase):
 class User(UserGet, table=True):
     user_id: int | None = Field(default=None, primary_key=True)
     hashed_password: str
-    # share_friend: list[ShareFriend] = Relationship(back_populates='user')
+    task_history: list['DailyTaskHistory'] = Relationship(back_populates='user')
 

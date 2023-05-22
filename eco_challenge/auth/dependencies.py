@@ -14,7 +14,7 @@ async def get_current_user(session: DbSession) -> user_model.User:
     """
     statement = sqlmodel.select(user_model.User).where(user_model.User.username == 'Maral')
     response = await session.execute(statement)
-    return response.first()
+    return response.scalars().first()
 
 
 CurrentUser = Annotated[user_model.User, fastapi.Depends(get_current_user)]
