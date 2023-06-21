@@ -15,7 +15,6 @@ class AnswerCreate(SQLModel):
 
 class AnswerGet(AnswerCreate):
     answer_id: int
-    # question: Question
 
 
 class Answer(AnswerCreate, table=True):

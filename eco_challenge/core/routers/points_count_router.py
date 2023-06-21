@@ -4,14 +4,14 @@ from sqlmodel import select
 
 from eco_challenge.core.database import DbSession
 from eco_challenge.core.models.points_count_model import PointsCount, PointsCountGet
+from eco_challenge.core.storages.points_count_storage import PointsCountStorageDepends
 
 router = APIRouter(prefix='/points_count', tags=['PointsCount'])
 
 
 @router.get('/')
-async def get_points_count(session: DbSession) -> list[PointsCountGet]:
-    points_count = await session.execute(select(PointsCount))
-    return points_count.scalars().all()
+async def get_points_count(storage: PointsCountStorageDepends) -> list[PointsCountGet]:
+    return await storage.get_objects()
 
 
 @router.get('/{points_count_id}')

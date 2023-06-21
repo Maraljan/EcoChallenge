@@ -2,8 +2,10 @@ from fastapi import FastAPI
 
 
 import contextlib
+
+from eco_challenge.core import routers
 from .core.database import DATA_BASE
-from . import routers, quiz_app, daily_task_app
+from . import quiz_app, daily_task_app
 
 
 @contextlib.asynccontextmanager
