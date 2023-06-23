@@ -1,14 +1,18 @@
-from fastapi import APIRouter
+import fastapi
+import asyncpg
 
 from eco_challenge.core.storages.user_storage import UserStorageDepends
 from eco_challenge.core.models.user_model import UserGet, UserCreate
 
-router = APIRouter(prefix='/users', tags=['Users'])
+router = fastapi.APIRouter(prefix='/users', tags=['Users'])
 
 
 @router.post('/')
 async def create_user(user_create: UserCreate, storage: UserStorageDepends) -> UserGet:
-    return await storage.save_object(user_create)
+    try:
+        return await storage.save_object(user_create)
+    except asyncpg.exceptions.UniqueViolationError:
+        raise fastapi.HTTPException(status_code=fastapi.status.HTTP_409_CONFLICT, detail='this email already exists')
 
 
 @router.get('/')

@@ -6,9 +6,11 @@ from eco_challenge.core.models.user_model import User
 from sqlmodel import SQLModel, Field, Relationship
 
 from .user_response_model import UserResponse, UserResponseGet
+from eco_challenge.core.time_convert import convert_dt_to_str_without_tz
 
 
 class DailyTaskHistoryCreate(SQLModel):
+
     start_time: datetime.datetime = Field(
         default_factory=datetime.datetime.utcnow,
         sa_column=Column(DateTime(timezone=False)),
@@ -17,7 +19,7 @@ class DailyTaskHistoryCreate(SQLModel):
         default=None,
         sa_column=Column(DateTime(timezone=False)),
     )
-    is_completed: bool | None = None
+    is_completed: bool = False
     task_id: int = Field(foreign_key='daily_task.task_id')
 
 
@@ -36,5 +38,9 @@ class DailyTaskHistory(DailyTaskHistoryCreate, table=True):
     daily_task: DailyTask = Relationship(back_populates='task_history', sa_relationship_kwargs={'lazy': 'selectin'})
     user_response: UserResponse | None = Relationship(
         back_populates='task_history',
-        sa_relationship_kwargs={'lazy': 'selectin', 'uselist': False},
+        sa_relationship_kwargs={
+            'lazy': 'selectin',
+            'uselist': False,
+            'cascade': 'delete',
+        },
     )

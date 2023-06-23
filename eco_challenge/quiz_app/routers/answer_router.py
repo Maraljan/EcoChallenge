@@ -8,9 +8,9 @@ router = APIRouter(prefix='/answer', tags=['Answer'])
 
 @router.post('/')
 async def create_answer(answer_create: AnswerCreate, storage: AnswerStorageDepends) -> AnswerGet:
-    return storage.save_object(answer_create)
+    return await storage.save_object(answer_create)
 
 
 @router.get('/')
 async def get_answers(storage: AnswerStorageDepends) -> list[AnswerGet]:
-    return storage.get_objects()
+    return await storage.get_objects()

@@ -9,6 +9,9 @@ from ..models.user_model import User
 class DailyTaskHistoryStorage(Storage[DailyTaskHistory, DailyTaskHistoryCreate]):
     model = DailyTaskHistory
 
+    def get_pk(self):
+        return self.model.task_history_id
+
     async def _create_instance(self, create_data: DailyTaskHistoryCreate, user: User | None = None) -> DailyTaskHistory:
         daily_task_history = DailyTaskHistory(**create_data.dict(), user_id=user.user_id)
         return daily_task_history

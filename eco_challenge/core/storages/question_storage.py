@@ -8,5 +8,8 @@ from .storage import Storage
 class QuestionStorage(Storage[Question, QuestionCreate]):
     model = Question
 
+    def get_pk(self):
+        return self.model.question_id
+
 
 QuestionStorageDepends = Annotated[QuestionStorage, Depends(QuestionStorage)]

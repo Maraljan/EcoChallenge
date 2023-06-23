@@ -13,7 +13,7 @@ async def create_quiz(quiz_create: QuizCreate, storage: QuizStorageDepends) -> Q
 
 @router.get('/')
 async def get_quizzes(storage: QuizStorageDepends) -> list[QuizGet]:
-    return storage.get_objects()
+    return await storage.get_objects()
 
 
 @router.get('/{quiz_id}')

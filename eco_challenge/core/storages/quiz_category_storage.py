@@ -8,5 +8,8 @@ from .storage import Storage
 class QuizCategoryStorage(Storage[QuizCategory, QuizCategoryCreate]):
     model = QuizCategory
 
+    def get_pk(self):
+        return self.model.category_id
+
 
 QuizCategoryStorageDepends = Annotated[QuizCategoryStorage, Depends(QuizCategoryStorage)]

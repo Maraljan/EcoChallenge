@@ -9,7 +9,8 @@ router = APIRouter(prefix='/share_friend', tags=['ShareFriends'])
 @router.post('/')
 async def create_shared_friend(
         share_friend_create: ShareFriendCreate,
-        storage: ShareFriendStorageDepends) -> ShareFriendGet:
+        storage: ShareFriendStorageDepends,
+) -> ShareFriendGet:
     return await storage.save_object(share_friend_create)
 
 

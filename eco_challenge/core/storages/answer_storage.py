@@ -6,7 +6,11 @@ from .storage import Storage
 
 
 class AnswerStorage(Storage[Answer, AnswerCreate]):
+
     model = Answer
+
+    def get_pk(self):
+        return self.model.answer_id
 
 
 AnswerStorageDepends = Annotated[AnswerStorage, Depends(AnswerStorage)]

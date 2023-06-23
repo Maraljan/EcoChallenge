@@ -8,5 +8,8 @@ from .storage import Storage
 class UserResponseStorage(Storage[UserResponse, UserResponseCreate]):
     model = UserResponse
 
+    def get_pk(self):
+        return self.model.user_response_id
+
 
 UserResponseStorageDepends = Annotated[UserResponseStorage, Depends(UserResponseStorage)]

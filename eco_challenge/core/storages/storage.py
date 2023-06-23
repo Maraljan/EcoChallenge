@@ -1,3 +1,5 @@
+import abc
+
 from typing import Generic, TypeVar, Type
 from fastapi import HTTPException, status
 
@@ -10,10 +12,9 @@ _DbModel = TypeVar('_DbModel', bound=sqlmodel.SQLModel)
 _CreateModel = TypeVar('_CreateModel', bound=sqlmodel.SQLModel)
 
 
-class Storage(Generic[_DbModel, _CreateModel]):
+class Storage(Generic[_DbModel, _CreateModel], abc.ABC):
 
     model: Type[_DbModel] = NotImplemented
-    pk = NotImplemented
 
     def __init__(self, session:  DbSession):
         self.session = session
@@ -40,7 +41,10 @@ class Storage(Generic[_DbModel, _CreateModel]):
         return self.model.from_orm(create_data)
 
     async def delete_object(self, pk: int):
-        statement = sqlmodel.delete(self.model).where(self.pk == pk)
+        statement = sqlmodel.delete(self.model).where(self.get_pk() == pk)
         await self.session.execute(statement)
         await self.session.commit()
 
+    @abc.abstractmethod
+    def get_pk(self):
+        pass

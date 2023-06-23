@@ -7,7 +7,7 @@ from eco_challenge.core.models.user_model import User
 from eco_challenge.core.storages import user_storage
 
 
-class Auth:
+class AuthService:
     def __init__(self):
         self._crypto_ctx = passlib.context.CryptContext(
             schemes=['sha256_crypt'],
@@ -15,10 +15,7 @@ class Auth:
         )
         self.oauth_scheme = OAuth2PasswordBearer(tokenUrl='/auth/login')
 
-    def hash_password(
-            self,
-            password: str,
-    ) -> str:
+    def hash_password(self, password: str) -> str:
         return self._crypto_ctx.hash(password)
 
     def verify_password(
@@ -58,4 +55,4 @@ class Auth:
         return user
 
 
-AUTH = Auth()
+AUTH_SERVICE = AuthService()

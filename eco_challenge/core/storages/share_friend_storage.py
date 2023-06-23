@@ -8,5 +8,8 @@ from .storage import Storage
 class ShareFriendStorage(Storage[ShareFriend, ShareFriendCreate]):
     model = ShareFriend
 
+    def get_pk(self):
+        return self.model.share_friend_id
+
 
 ShareFriendStorageDepends = Annotated[ShareFriendStorage, Depends(ShareFriendStorage)]
