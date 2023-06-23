@@ -6,7 +6,6 @@ from eco_challenge.core.models.user_model import User
 from sqlmodel import SQLModel, Field, Relationship
 
 from .user_response_model import UserResponse, UserResponseGet
-from eco_challenge.core.time_convert import convert_dt_to_str_without_tz
 
 
 class DailyTaskHistoryCreate(SQLModel):

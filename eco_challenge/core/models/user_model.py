@@ -51,8 +51,13 @@ class User(UserBase, table=True):
             'cascade': 'delete',
         }
     )
-    points_count: PointsCount = Relationship(back_populates='user')
-    points_count_id: int = Field(foreign_key='points_count.points_count_id')
+    points_count: PointsCount = Relationship(
+        back_populates='user',
+        sa_relationship_kwargs={
+            'cascade': 'delete',
+        }
+    )
+    points_count_id: int | None = Field(default=None, foreign_key='points_count.points_count_id')
     role_id: int = Field(foreign_key='role.role_id')
     user_role: Role = Relationship(
         back_populates='users',

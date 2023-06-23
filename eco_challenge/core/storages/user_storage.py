@@ -19,10 +19,12 @@ class UserStorage(Storage[User, UserCreate]):
     async def _create_instance(self, create_data: UserCreate, user: User | None = None) -> User:
         role_storage = RoleStorageDepends(self.session)
         user_role = await role_storage.get_by_name(RoleName.USER)
+        points_count = PointsCount()
+        self.session.add(points_count)
         user = User(
             role_id=user_role.role_id,
             hashed_password=authservice.AUTH_SERVICE.hash_password(create_data.password),
-            points_count=PointsCount(),
+            points_count=points_count,
             **create_data.dict(),
         )
         return user

@@ -1,6 +1,7 @@
 import fastapi
 import asyncpg
 
+from eco_challenge.auth.dependencies import CurrentAdmin
 from eco_challenge.core.storages.user_storage import UserStorageDepends
 from eco_challenge.core.models.user_model import UserGet, UserCreate
 
@@ -16,15 +17,15 @@ async def create_user(user_create: UserCreate, storage: UserStorageDepends) -> U
 
 
 @router.get('/')
-async def get_users(storage: UserStorageDepends) -> list[UserGet]:
+async def get_users(storage: UserStorageDepends, _: CurrentAdmin) -> list[UserGet]:
     return await storage.get_objects()
 
 
 @router.get('/{user_id}')
-async def get_user(user_id: int, storage: UserStorageDepends) -> UserGet:
+async def get_user(user_id: int, storage: UserStorageDepends, _: CurrentAdmin) -> UserGet:
     return await storage.get_obj(user_id)
 
 
 @router.delete('/{user_id}')
-async def delete_user(user_id: int, storage: UserStorageDepends):
+async def delete_user(user_id: int, storage: UserStorageDepends, _: CurrentAdmin):
     return await storage.delete_object(user_id)

@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from eco_challenge.auth import CurrentUser
+from eco_challenge.auth.dependencies import CurrentAdmin
 from eco_challenge.core.storages.daily_task_history_storage import DailyTaskHistoryStorageDepends
 
 from eco_challenge.daily_task_app.models.daily_task_history_model import DailyTaskHistoryGet, DailyTaskHistory, \
@@ -19,10 +20,10 @@ async def create_task_history(
 
 
 @router.get('/')
-async def get_task_history(storage: DailyTaskHistoryStorageDepends) -> list[DailyTaskHistoryGet]:
+async def get_task_history(storage: DailyTaskHistoryStorageDepends, _: CurrentAdmin) -> list[DailyTaskHistoryGet]:
     return await storage.get_objects()
 
 
 @router.delete('/{task_history_id}')
-async def delete_task_history(task_history_id: int, storage: DailyTaskHistoryStorageDepends):
+async def delete_task_history(task_history_id: int, storage: DailyTaskHistoryStorageDepends, _: CurrentAdmin):
     return await storage.delete_object(task_history_id)

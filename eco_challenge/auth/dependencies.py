@@ -24,8 +24,8 @@ async def auth_user_by_token(session: DbSession, token: JwtToken):
 
 
 async def get_current_user(
-        session: DbSession,
-        access_raw_token: str = fastapi.Depends(authservice.AUTH_SERVICE.oauth_scheme),
+    session: DbSession,
+    access_raw_token: str = fastapi.Depends(authservice.AUTH_SERVICE.oauth_scheme),
 ) -> User:
     token = JwtToken.decode(access_raw_token)
     return await auth_user_by_token(session, token)
@@ -38,5 +38,5 @@ async def get_current_admin(user: CurrentUser) -> User:
         raise fastapi.HTTPException(status_code=fastapi.status.HTTP_403_FORBIDDEN)
     return user
 
-CurrentAdmin = Annotated[User, fastapi.Depends(get_current_admin)]
 
+CurrentAdmin = Annotated[User, fastapi.Depends(get_current_admin)]
