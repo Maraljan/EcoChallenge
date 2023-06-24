@@ -19,5 +19,5 @@ class PointsCountGet(PointsCountCreate):
 
 class PointsCount(PointsCountCreate, table=True):
     __tablename__ = 'points_count'
-    points_count_id: int | None = Field(default=None, primary_key=True)
+    points_count_id: int = Field(primary_key=True)
     user: 'User' = Relationship(back_populates='points_count', sa_relationship_kwargs={'uselist': False})

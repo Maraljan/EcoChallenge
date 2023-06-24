@@ -1,45 +1,79 @@
-from fastapi import APIRouter, HTTPException
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
-import sqlmodel
-from starlette import status
+import fastapi
+from fastapi import APIRouter
 
-from eco_challenge.core.database import DbSession
-
-from eco_challenge.daily_task_app.models.user_response_model import \
-    UserResponse, \
-    UserResponseGet, \
-    UserResponseCreate
+from eco_challenge.auth import CurrentUser
+from eco_challenge.auth.dependencies import CurrentAdmin
+from eco_challenge.core.models.points_transaction_model import PointsTransaction
+from eco_challenge.core.storages.points_count_storage import PointsCountStorageDepends, PointsCountStorage
+from eco_challenge.core.storages.points_transaction_storage import PointsTransactionStorageDepends
+from eco_challenge.core.storages.user_response_storage import UserResponseStorageDepends
+from eco_challenge.core.storages.user_storage import UserStorage
+from eco_challenge.daily_task_app.models.user_response_model import (
+    UserResponseGet, UserResponseCreate, ActionApprove, UserResponse,
+)
 
 
 router = APIRouter(prefix='/user_response', tags=['UserResponse'])
 
 
+@router.post('/approve')
+async def approve(
+    approve_create: ActionApprove,
+    storage: UserResponseStorageDepends,
+    _: CurrentAdmin,
+):
+    user_response = await storage.get_obj(approve_create.user_response_id)
+    history_task = user_response.task_history
+    if history_task.is_completed is not None:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_429_TOO_MANY_REQUESTS,
+            detail='Action already processed',
+        )
+    if approve_create.is_completed:
+        history_task.is_completed = True
+        transaction = PointsTransaction(points=history_task.daily_task.points, user_id=history_task.user_id)
+        storage.session.add(transaction)
+        user_storage = UserStorage(storage.session)
+        user = await user_storage.get_obj(history_task.user_id)
+        point_storage = PointsCountStorage(storage.session)
+        points_count = await point_storage.get_obj(user.points_count_id)
+        points_count.points += transaction.points
+        storage.session.add(points_count)
+    else:
+        history_task.is_completed = False
+
+    storage.session.add(history_task)
+    await storage.session.commit()
+
+
+
 @router.post('/')
-async def create_user_response(daily_task_create: UserResponseCreate, session: DbSession) -> UserResponseGet:
-    user_response = UserResponse(**daily_task_create.dict())
-    session.add(user_response)
-    await session.commit()
-    await session.refresh(user_response)
-    return user_response
+async def create_user_response(
+    user_response_create: UserResponseCreate,
+    storage: UserResponseStorageDepends,
+    _: CurrentUser
+) -> UserResponseGet:
+    return await storage.save_object(user_response_create)
+
+
+@router.get('/')
+async def get_user_responses(storage: UserResponseStorageDepends, _: CurrentAdmin) -> list[UserResponseGet]:
+    return await storage.get_objects()
 
 
 @router.get('/{user_response_id}')
-async def get_user_response(user_response_id: int, session: DbSession) -> UserResponseGet:
-    # statement = sqlmodel.select(UserResponse).options(selectinload('*'))
-    # results = await session.execute(statement)
-    # user_response = results.scalars().all()
-    # return user_response
-
-    response = await session.execute(select(UserResponse).where(UserResponse.user_response_id == user_response_id))
-    user_response = response.scalars().one_or_none()
-    if user_response is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return user_response
+async def get_user_response(
+    user_response_id: int,
+    storage: UserResponseStorageDepends,
+    _: CurrentAdmin
+) -> UserResponseGet:
+    return await storage.get_obj(user_response_id)
 
 
 @router.delete('/{user_response_id}')
-async def delete_user_response(user_response_id: int, session: DbSession):
-    statement = sqlmodel.delete(UserResponse).where(UserResponse.user_response_id == user_response_id)
-    await session.execute(statement)
-    await session.commit()
+async def delete_user_response(
+    user_response_id: int,
+    storage: UserResponseStorageDepends,
+    _: CurrentAdmin
+) -> UserResponseGet:
+    return await storage.delete_object(user_response_id)

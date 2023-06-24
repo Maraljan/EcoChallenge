@@ -9,6 +9,7 @@ from .user_response_model import UserResponse, UserResponseGet
 
 
 class DailyTaskHistoryCreate(SQLModel):
+
     start_time: datetime.datetime = Field(
         default_factory=datetime.datetime.utcnow,
         sa_column=Column(DateTime(timezone=False)),
@@ -17,7 +18,6 @@ class DailyTaskHistoryCreate(SQLModel):
         default=None,
         sa_column=Column(DateTime(timezone=False)),
     )
-    is_completed: bool | None = None
     task_id: int = Field(foreign_key='daily_task.task_id')
 
 
@@ -26,6 +26,7 @@ class DailyTaskHistoryGet(DailyTaskHistoryCreate):
     daily_task: DailyTaskGet
     user_response: UserResponseGet | None
     user_id: int
+    is_completed: bool | None
 
 
 class DailyTaskHistory(DailyTaskHistoryCreate, table=True):
@@ -36,5 +37,11 @@ class DailyTaskHistory(DailyTaskHistoryCreate, table=True):
     daily_task: DailyTask = Relationship(back_populates='task_history', sa_relationship_kwargs={'lazy': 'selectin'})
     user_response: UserResponse | None = Relationship(
         back_populates='task_history',
-        sa_relationship_kwargs={'lazy': 'selectin', 'uselist': False},
+        sa_relationship_kwargs={
+            'lazy': 'selectin',
+            'uselist': False,
+            'cascade': 'delete',
+        },
     )
+    is_completed: bool | None = None
+

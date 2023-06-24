@@ -22,4 +22,4 @@ class QuestionGet(QuestionCreate):
 class Question(QuestionCreate, table=True):
     question_id: int | None = Field(default=None, primary_key=True)
     quiz: 'Quiz' = Relationship(back_populates='questions')
-    answers: list[Answer] = Relationship(back_populates='question')
+    answers: list[Answer] = Relationship(back_populates='question', sa_relationship_kwargs={'lazy': 'selectin'})

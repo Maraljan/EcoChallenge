@@ -1,33 +1,23 @@
 from fastapi import APIRouter
-from sqlalchemy.orm import selectinload
-import sqlmodel
 
-from eco_challenge.core.database import DbSession
-
-from eco_challenge.quiz_app.models.question_model import Question, QuestionCreate, QuestionGet
+from eco_challenge.auth import CurrentUser
+from eco_challenge.auth.dependencies import CurrentAdmin
+from eco_challenge.core.storages.question_storage import QuestionStorageDepends
+from eco_challenge.quiz_app.models.question_model import QuestionCreate, QuestionGet
 
 router = APIRouter(prefix='/question', tags=['Question'])
 
 
 @router.post('/')
-async def create_question(question_create: QuestionCreate, session: DbSession) -> QuestionGet:
-    question = Question(**question_create.dict())
-    session.add(question)
-    await session.commit()
-    await session.refresh(question)
-    return question
+async def create_question(question_create: QuestionCreate, storage: QuestionStorageDepends, _: CurrentAdmin) -> QuestionGet:
+    return await storage.save_object(question_create)
 
 
 @router.get('/')
-async def get_questions(session: DbSession) -> list[QuestionGet]:
-    statement = sqlmodel.select(Question).options(selectinload('*'))
-    results = await session.execute(statement)
-    questions = results.scalars().all()
-    return questions
+async def get_questions(storage: QuestionStorageDepends, _: CurrentUser) -> list[QuestionGet]:
+    return await storage.get_objects()
 
 
 @router.delete('/{question_id}')
-async def delete_question(question_id: int, session: DbSession):
-    statement = sqlmodel.delete(Question).where(Question.question_id == question_id)
-    await session.execute(statement)
-    await session.commit()
+async def delete_question(question_id: int, storage: QuestionStorageDepends, _: CurrentAdmin):
+    return await storage.delete_object(question_id)

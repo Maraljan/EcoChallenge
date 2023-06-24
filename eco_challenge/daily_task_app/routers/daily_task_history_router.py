@@ -1,43 +1,29 @@
 from fastapi import APIRouter
-from sqlalchemy.orm import selectinload
-import sqlmodel
-
-from eco_challenge.core.database import DbSession
-
-from eco_challenge.daily_task_app.models.daily_task_history_model import \
-    DailyTaskHistoryCreate, \
-    DailyTaskHistoryGet, \
-    DailyTaskHistory
-# from eco_challenge.daily_task_app.models.daily_task_model import DailyTask, DailyTaskGet
 
 from eco_challenge.auth import CurrentUser
+from eco_challenge.auth.dependencies import CurrentAdmin
+from eco_challenge.core.storages.daily_task_history_storage import DailyTaskHistoryStorageDepends
+
+from eco_challenge.daily_task_app.models.daily_task_history_model import DailyTaskHistoryGet, DailyTaskHistory, \
+    DailyTaskHistoryCreate
 
 router = APIRouter(prefix='/daily_task_history', tags=['DailyTaskHistory'])
 
 
-@router.post('/')
+@router.post('/', response_model=DailyTaskHistoryGet)
 async def create_task_history(
-    daily_task_create: DailyTaskHistoryCreate,
-    user: CurrentUser,
-    session: DbSession,
-) -> DailyTaskHistoryGet:
-    daily_task_history = DailyTaskHistory(**daily_task_create.dict(), user_id=user.user_id)
-    session.add(daily_task_history)
-    await session.commit()
-    await session.refresh(daily_task_history)
-    return daily_task_history
+        daily_task_create: DailyTaskHistoryCreate,
+        storage: DailyTaskHistoryStorageDepends,
+        user: CurrentUser,
+) -> DailyTaskHistory:
+    return await storage.save_object(daily_task_create, user=user)
 
 
 @router.get('/')
-async def get_task_history(session: DbSession) -> list[DailyTaskHistoryGet]:
-    statement = sqlmodel.select(DailyTaskHistory).options(selectinload('*'))
-    results = await session.execute(statement)
-    task_history = results.scalars().all()
-    return task_history
+async def get_task_history(storage: DailyTaskHistoryStorageDepends, _: CurrentAdmin) -> list[DailyTaskHistoryGet]:
+    return await storage.get_objects()
 
 
 @router.delete('/{task_history_id}')
-async def delete_task_history(task_history_id: int, session: DbSession):
-    statement = sqlmodel.delete(DailyTaskHistory).where(DailyTaskHistory.task_history_id == task_history_id)
-    await session.execute(statement)
-    await session.commit()
+async def delete_task_history(task_history_id: int, storage: DailyTaskHistoryStorageDepends, _: CurrentAdmin):
+    return await storage.delete_object(task_history_id)

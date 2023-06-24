@@ -18,5 +18,5 @@ class QuizGet(QuizCreate):
 
 class Quiz(QuizCreate, table=True):
     quiz_id: int | None = Field(default=None, primary_key=True)
-    category: QuizCategory = Relationship(back_populates='quizzes')
-    questions: list[Question] = Relationship(back_populates='quiz')
+    category: QuizCategory = Relationship(back_populates='quizzes', sa_relationship_kwargs={'lazy': 'selectin'})
+    questions: list[Question] = Relationship(back_populates='quiz', sa_relationship_kwargs={'lazy': 'selectin'})

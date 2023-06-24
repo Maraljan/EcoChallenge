@@ -1,33 +1,27 @@
 from fastapi import APIRouter
-from sqlalchemy.orm import selectinload
-import sqlmodel
 
-from eco_challenge.core.database import DbSession
-
-from eco_challenge.quiz_app.models.quiz_model import QuizGet, QuizCreate, Quiz
+from eco_challenge.auth.dependencies import CurrentAdmin
+from eco_challenge.core.storages.quiz_storage import QuizStorageDepends
+from eco_challenge.quiz_app.models.quiz_model import QuizGet, QuizCreate
 
 router = APIRouter(prefix='/quiz', tags=['Quiz'])
 
 
 @router.post('/')
-async def create_quiz(quiz_create: QuizCreate, session: DbSession) -> QuizGet:
-    quiz = Quiz(**quiz_create.dict())
-    session.add(quiz)
-    await session.commit()
-    await session.refresh(quiz, [Quiz.category])
-    return quiz
+async def create_quiz(quiz_create: QuizCreate, storage: QuizStorageDepends, _: CurrentAdmin) -> QuizGet:
+    return await storage.save_object(quiz_create)
 
 
 @router.get('/')
-async def get_quizzes(session: DbSession) -> list[QuizGet]:
-    statement = sqlmodel.select(Quiz).options(selectinload('*'))
-    results = await session.execute(statement)
-    quizzes = results.scalars().all()
-    return quizzes
+async def get_quizzes(storage: QuizStorageDepends) -> list[QuizGet]:
+    return await storage.get_objects()
+
+
+@router.get('/{quiz_id}')
+async def get_quiz(quiz_id: int, storage: QuizStorageDepends):
+    return await storage.get_obj(quiz_id)
 
 
 @router.delete('/{quiz_id}')
-async def delete_quiz(quiz_id: int, session: DbSession):
-    statement = sqlmodel.delete(Quiz).where(Quiz.quiz_id == quiz_id)
-    await session.execute(statement)
-    await session.commit()
+async def delete_quiz(quiz_id: int, storage: QuizStorageDepends, _: CurrentAdmin):
+    return await storage.delete_object(quiz_id)
