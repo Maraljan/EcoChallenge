@@ -18,7 +18,6 @@ class DailyTaskHistoryCreate(SQLModel):
         default=None,
         sa_column=Column(DateTime(timezone=False)),
     )
-    is_completed: bool = False
     task_id: int = Field(foreign_key='daily_task.task_id')
 
 
@@ -27,6 +26,7 @@ class DailyTaskHistoryGet(DailyTaskHistoryCreate):
     daily_task: DailyTaskGet
     user_response: UserResponseGet | None
     user_id: int
+    is_completed: bool | None
 
 
 class DailyTaskHistory(DailyTaskHistoryCreate, table=True):
@@ -43,3 +43,5 @@ class DailyTaskHistory(DailyTaskHistoryCreate, table=True):
             'cascade': 'delete',
         },
     )
+    is_completed: bool | None = None
+
