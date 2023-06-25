@@ -10,6 +10,16 @@ class QuizCreate(SQLModel):
     category_id: int = Field(foreign_key='quiz_category.category_id')
 
 
+class QuizValidateAction(SQLModel):
+    quiz_id: int
+    answers: dict[int, int]
+
+
+class QuizValidationResponse(SQLModel):
+    quiz_id: int
+    answers: dict[int, bool]
+
+
 class QuizGet(QuizCreate):
     quiz_id: int
     category: QuizCategory
