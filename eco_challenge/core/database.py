@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection, create_async_e
 DB_TYPE = 'postgresql+asyncpg'
 USERNAME = 'postgres'
 PASSWORD = '3101'
-HOST = '127.0.0.1'
+HOST = 'eco_challenge_db'
 PORT = '5432'
 DB = 'EcoChallenge'
 
