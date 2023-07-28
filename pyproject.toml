@@ -17,6 +17,8 @@ passlib = "^1.7.4"
 python-jose = "^3.3.0"
 python-multipart = "^0.0.6"
 
+[tool.poetry.group.dev.dependencies]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

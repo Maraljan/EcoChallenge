@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+
+  eco_challenge:
+    container_name: 'eco_challenge'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8000:8000'
+    depends_on:
+      - eco_challenge_db
+
+  eco_challenge_db:
+    container_name: 'eco_challenge_db'
+    image: 'postgres:latest'
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=3101
